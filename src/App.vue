@@ -1,129 +1,202 @@
 <script setup>
 import { ref, onMounted } from 'vue'
-import TodoItem from './components/TodoItem.vue'
+import BookItem from './components/BookItem.vue'
 
-const todos = ref([])
+const books = ref([])
 
-const newTodo = ref('')
+const newTitle = ref('')
+const newAuthor = ref('')
+const newCategory = ref('')
+const newYear = ref('')
 
-function addTodo() {
-  if (newTodo.value.trim() === '') {
+function addBook() {
+  if (
+    newTitle.value.trim() === '' ||
+    newAuthor.value.trim() === '' ||
+    newCategory.value.trim() === '' ||
+    newYear.value === ''
+  ) {
     return
   }
 
-  todos.value.push({
+  books.value.push({
     id: Date.now(),
-    title: newTodo.value,
-    completed: false
+    title: newTitle.value,
+    author: newAuthor.value,
+    category: newCategory.value,
+    year: newYear.value,
+    available: true
   })
 
-  newTodo.value = ''
+  newTitle.value = ''
+  newAuthor.value = ''
+  newCategory.value = ''
+  newYear.value = ''
 
-  saveTodos()
+  saveBooks()
 }
 
-function deleteTodo(id) {
-  todos.value = todos.value.filter(todo => todo.id !==id )
+function deleteBook(id) {
+  books.value = books.value.filter(
+    book => book.id !== id
+  )
 
-  saveTodos()
+  saveBooks()
 }
 
-function updateTodo(updatedTodo) {
-  const index = todos.value.findIndex(todo => todo.id === updatedTodo.id)
+function updateBook(updatedBook) {
+  const index = books.value.findIndex(
+    book => book.id === updatedBook.id
+  )
 
   if (index !== -1) {
-    todos.value[index] = updatedTodo
+    books.value[index] = updatedBook
   }
 
-  saveTodos()
+  saveBooks()
 }
 
-function saveTodos() {
- localStorage.setItem('todos', JSON.stringify(todos.value))
+function saveBooks() {
+  localStorage.setItem(
+    'books',
+    JSON.stringify(books.value)
+  )
 }
 
 onMounted(() => {
-  const savedTodos = localStorage.getItem('todos')
+  const savedBooks = localStorage.getItem('books')
 
-  if (savedTodos) {
-    todos.value = JSON.parse(savedTodos)
+  if (savedBooks) {
+    books.value = JSON.parse(savedBooks)
   }
 })
-
 </script>
 
 
 <template>
+
   <div class="container">
 
-    <h1>My To-Do List</h1>
+    <h1>📚 My Library</h1>
 
-    <!-- Add Todo -->
-    <div class="add-todo">
+    <!-- Add Book -->
+
+    <div class="add-book">
+
       <input
-      v-model="newTodo"
-      type="text"
-      placeholder="Enter a task"
-      @keyup.enter="addTodo"
+        v-model="newTitle"
+        type="text"
+        placeholder="Book title"
       />
 
-      <button @click="addTodo">
-        Add
+      <input
+        v-model="newAuthor"
+        type="text"
+        placeholder="Author"
+      />
+
+      <input
+        v-model="newCategory"
+        type="text"
+        placeholder="Category"
+      />
+
+      <input
+        v-model="newYear"
+        type="number"
+        placeholder="Year"
+      />
+
+      <button @click="addBook">
+        Add Book
       </button>
+
     </div>
 
-    <!-- Todo List -->
-    <div class="todo-list">
 
-      <TodoItem
-      v-for="todo in todos"
-      :key="todo.id"
-      :todo="todo"
-      @delete="deleteTodo"
-      @update="updateTodo"
+    <!-- Book List -->
+
+    <div class="book-list">
+
+      <BookItem
+        v-for="book in books"
+        :key="book.id"
+        :book="book"
+        @delete="deleteBook"
+        @update="updateBook"
       />
 
     </div>
 
   </div>
+
 </template>
 
 
 <style>
+
 .container {
-  width: 500px;
+  width: 600px;
+
   margin: 50px auto;
+
   font-family: Arial, sans-serif;
 }
 
-
 h1 {
   text-align: center;
+
+  color: #4c1d95;
 }
 
-
-.add-todo {
+.add-book {
   display: flex;
+
+  flex-direction: column;
+
   gap: 10px;
+
   margin-bottom: 20px;
+
+  padding: 20px;
+
+  background: #f5f3ff;
+
+  border-radius: 8px;
 }
 
-
-.add-todo input {
-  flex: 1;
+.add-book input {
   padding: 10px;
+
+  border: 1px solid #ccc;
+
+  border-radius: 5px;
 }
 
-
-button {
+.add-book button {
   padding: 10px 15px;
+
+  background: #7c3aed;
+
+  color: white;
+
+  border: none;
+
+  border-radius: 5px;
+
   cursor: pointer;
 }
 
+.add-book button:hover {
+  background: #6d28d9;
+}
 
-.todo-list {
+.book-list {
   display: flex;
+
   flex-direction: column;
+
   gap: 10px;
 }
+
 </style>
